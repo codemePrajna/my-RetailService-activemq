@@ -1,0 +1,9 @@
+com\common\exception\GlobalExceptionHandler.class
+com\common\util\ProductEnum.class
+com\common\repository\ProductRepository.class
+com\common\config\SwaggerConfig.class
+com\common\util\ProductQueue.class
+com\common\exception\GlobalExceptionHandler$1.class
+com\common\response\Response.class
+com\common\entity\Product.class
+com\common\util\SharedObject.class
