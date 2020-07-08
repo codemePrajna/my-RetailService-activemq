@@ -4,11 +4,9 @@ import com.common.entity.Product;
 import com.common.repository.ProductRepository;
 import com.common.util.ProductEnum;
 import com.common.util.ProductQueue;
+import com.common.util.SharedObject;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -24,11 +22,6 @@ public class ProductConstructService {
 
     @Autowired
     ProductRepository productRepository;
-    @Autowired
-    JobLauncher jobLauncher;
-    @Autowired
-    @Qualifier("productNameFetchJob")
-    Job job;
     @Autowired
     ProductQueue productQueue;
 
@@ -65,15 +58,21 @@ public class ProductConstructService {
         }
     }
 
-    public boolean updateProductDetails() {
+    public void updateProductDetails() {
         List<UUID> productReqIdList = productQueue.getProductUpdateStateQueue().entrySet().stream()
                 .filter(entry -> ProductEnum.PENDING.equals(entry.getValue()))
                 .map(Map.Entry::getKey).collect(Collectors.toList());
         for (UUID productReqId : productReqIdList) {
-            String productId = productQueue.getProductUpdateQueue().get(productReqId);
-            productRepository.findByProductId(productId);
-
+            productQueue.getProductUpdateStateQueue().put(productReqId, ProductEnum.STARTED);
+            Product product = productQueue.getProductUpdateQueue().get(productReqId);
+            Product returnedProduct = productRepository.findByProductId(product.getProductId());
+            returnedProduct.setPrice(product.getPrice());
+            productRepository.save(returnedProduct);
+            productQueue.getProductUpdateStateQueue().put(productReqId, ProductEnum.COMPLETED);
+            synchronized (SharedObject.updateObj) {
+                SharedObject.updateObj.notify();
+            }
         }
-        return true;
+
     }
 }

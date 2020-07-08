@@ -37,13 +37,37 @@ public class ProductServiceImpl implements ProductService {
         }
         //change the state of the queue such that the entry can be deleted
         productQueue.getProductStateQueue().put(productReqId, ProductEnum.SERVED);
-        return productRepository.findByProductId(productQueue.getProductQueue().get(productReqId));
-
+        Product product = productRepository.findByProductId(productQueue.getProductQueue().get(productReqId));
+        if (product == null || product.getName() == null) {
+            throw new RuntimeException("Product details not available");
+        }
+        return product;
     }
 
     @Override
-    public String updateProduct(String productId) {
-        return null;
+    public Product updateProductDetails(UUID productReqId) throws InterruptedException {
+        //fetch the details of the product with updated price
+        synchronized (SharedObject.updateObj) {
+            try {
+                //fetch details of the products which are in pending state
+                if (!productQueue.getProductUpdateStateQueue().get(productReqId).equals(ProductEnum.COMPLETED)) {
+                    //wait until construct module loads the product details onto db
+                    SharedObject.updateObj.wait();
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException("Failed to retrieve product details for product");
+            }
+        }
+
+        String productId = productQueue.getProductUpdateQueue().get(productReqId).getProductId();
+        UUID fetchProductReqId = insertProductRequest(productId);
+        Product updatedProduct = fetchProductDetails(fetchProductReqId);
+        productQueue.getProductStateQueue().put(productReqId, ProductEnum.SERVED);
+        if (updatedProduct == null || updatedProduct.getName() == null) {
+            throw new RuntimeException("Product details not updated successfully");
+        }
+
+        return updatedProduct;
     }
 
     @Override
@@ -55,9 +79,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public UUID insertProductUpdateRequest(String productId) {
+    public UUID insertProductUpdateRequest(Product product) {
         UUID productReqId = UUID.randomUUID();
-        productQueue.getProductUpdateQueue().put(productReqId, productId);
+        productQueue.getProductUpdateQueue().put(productReqId, product);
         productQueue.getProductUpdateStateQueue().put(productReqId, ProductEnum.PENDING);
         return productReqId;
     }

@@ -14,7 +14,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class ScheduleService {
     @Autowired
@@ -46,10 +49,12 @@ public class ScheduleService {
 
     private void fetchProduct() throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
         if ((productQueue.getProductQueue().size() > 0)) {
-            if (productQueue.getProductStateQueue().get(productQueue.getProductQueue().keySet().toArray()[0]).equals(ProductEnum.PENDING)) {
-                UUID requestId = (UUID) productQueue.getProductStateQueue().keySet().toArray()[0];
+            List<UUID> productReqIdList = productQueue.getProductStateQueue().entrySet().stream()
+                    .filter(entry -> ProductEnum.PENDING.equals(entry.getValue()))
+                    .map(Map.Entry::getKey).collect(Collectors.toList());
+            for (UUID prodReqId : productReqIdList) {
                 JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
-                jobParametersBuilder.addString("requestId", requestId.toString());
+                jobParametersBuilder.addString("requestId", prodReqId.toString());
                 jobLauncher.run(job, jobParametersBuilder.toJobParameters());
             }
         }

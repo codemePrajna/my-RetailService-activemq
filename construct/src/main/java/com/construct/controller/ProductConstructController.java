@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
+@RequestMapping("/v1/admin/product")
 public class ProductConstructController {
 
     @Autowired
@@ -20,7 +22,7 @@ public class ProductConstructController {
      * @return
      */
     @ApiOperation(value = "Load Product details to product database")
-    @GetMapping(value = "/product/load", produces = "application/json")
+    @GetMapping(value = "/load", produces = "application/json")
     public ResponseEntity<Response<String>> loadProductDetails() {
         productConstructService.loadProductDetails();
         return new Response<String>()

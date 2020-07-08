@@ -49,7 +49,7 @@ BONUS: Accepts an HTTP PUT request at the same path (/products/{id}), containing
 - Initial working cut from receiving the data from user to publishing it back with details
 - Unit test for few scenarios only
 
-##RoadMap
+## RoadMap
 
 - Caching
 - Pagination
@@ -60,3 +60,8 @@ BONUS: Accepts an HTTP PUT request at the same path (/products/{id}), containing
 
 ## To run the application
 Download the project. Navigate to the project folder and run mvn spring-boot:run Read the API documentation in Swagger2 (run http://localhost:8080/swagger-ui.html on the browser)
+
+## Screenshots
+![Load Product](.\images\LoadProduct.jpg)
+![Fetch Product](.\images\FetchProduct.jpg)
+![Update Product](.\images\UpdateProduct.jpg)

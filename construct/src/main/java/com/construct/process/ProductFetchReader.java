@@ -23,12 +23,10 @@ import java.util.UUID;
 @Component
 @StepScope
 public class ProductFetchReader implements ItemReader<String> {
-    @Value("${target.product.url}")
-    String targetUrl;
-
     @Value("#{jobParameters['requestId']}")
     protected String requestId;
-
+    @Value("${target.product.url}")
+    String targetUrl;
     @Autowired
     ProductQueue productQueue;
     @Autowired
@@ -48,15 +46,18 @@ public class ProductFetchReader implements ItemReader<String> {
         }
         String productId = productQueue.getProductQueue().get(UUID.fromString(requestId));
         productQueue.getProductStateQueue().put(UUID.fromString(requestId), ProductEnum.STARTED);
+        try {
+            ResponseEntity<String> productResponse = restTemplate.getForEntity(getTargetURL(productId), String.class);
+            if (productResponse != null) {
+                JSONObject jsonObject = new JSONObject(productResponse.getBody());
+                if (jsonObject.getJSONObject("product").getJSONObject("item").getJSONObject("product_description") != null) {
+                    JSONObject productDescription = jsonObject.getJSONObject("product").getJSONObject("item").getJSONObject("product_description");
+                    productName = productDescription.getString("title");
+                }
 
-        ResponseEntity<String> productResponse = restTemplate.getForEntity(getTargetURL(productId), String.class);
-        if (productResponse != null) {
-            JSONObject jsonObject = new JSONObject(productResponse.getBody());
-            if (jsonObject.getJSONObject("product").getJSONObject("item").getJSONObject("product_description") != null) {
-                JSONObject productDescription = jsonObject.getJSONObject("product").getJSONObject("item").getJSONObject("product_description");
-                productName = productDescription.getString("title");
             }
-
+        } catch (Exception e) {
+            throw new RuntimeException("Product details not found");
         }
         return productName;
     }

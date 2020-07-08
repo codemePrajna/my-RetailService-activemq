@@ -28,6 +28,7 @@ public class ProductFetchWriterTest {
     ProductFetchWriter productFetchWriter;
 
     Product product = new Product();
+
     @Before
     public void setUp() throws Exception {
         product.setName("testName");
@@ -50,17 +51,17 @@ public class ProductFetchWriterTest {
         Mockito.when(productQueueMap.size()).thenReturn(1);
 
         Product productInput = Mockito.mock(Product.class);
-        //Mockito.when(productRepository.findByProductId(Mockito.anyString())).thenReturn(product);
-        Mockito.doReturn(product).when(productRepository).findByProductId(Mockito.anyString());
+        Mockito.when(productRepository.findByProductId(Mockito.anyString())).thenReturn(product);
+        //Mockito.doReturn(product).when(productRepository).findByProductId(Mockito.anyString());
 
-       productInput.setName("testName");
+        Mockito.when(productInput.getName()).thenReturn("testName");
         Mockito.doReturn(product).when(productRepository).save(Mockito.any(Product.class));
 
         ConcurrentHashMap productStateQueue = Mockito.mock(ConcurrentHashMap.class);
         Mockito.when(productQueue.getProductStateQueue()).thenReturn(productStateQueue);
 
         productFetchWriter.write(Mockito.anyList());
-        Assert.assertEquals(productRepository.findByProductId("12345"),product);
+        Assert.assertEquals(productRepository.findByProductId("12345"), product);
 
 
     }

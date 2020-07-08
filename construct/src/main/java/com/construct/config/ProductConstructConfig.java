@@ -34,6 +34,7 @@ public class ProductConstructConfig {
 
     /**
      * Name fetch batch job
+     *
      * @return
      */
     @Bean(name = "productNameFetchJob")

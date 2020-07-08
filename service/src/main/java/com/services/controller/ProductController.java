@@ -45,9 +45,12 @@ public class ProductController {
      */
     @ApiOperation(value = "Update product price details for a given Product")
     @PutMapping(value = "/{productId}", produces = "application/json")
-    public ResponseEntity<Response<Product>> updateProductDetails(@ApiParam(value = "ProductId", required = true) @PathVariable String productId) throws InterruptedException {
-        UUID productReqId = productService.insertProductUpdateRequest(productId);
-        Product product = productService.fetchProductDetails(productReqId);
+    public ResponseEntity<Response<Product>> updateProductDetails(@ApiParam(value = "ProductId", required = true) @PathVariable String productId
+            , @RequestBody Product productInput) throws InterruptedException {
+        productInput.setProductId(productId);
+        UUID productReqId = productService.insertProductUpdateRequest(productInput);
+
+        Product product = productService.updateProductDetails(productReqId);
         return new Response<Product>()
                 .setStatus(200)
                 .setMessage(product).toResponseEntity();

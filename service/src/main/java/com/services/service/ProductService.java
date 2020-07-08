@@ -7,9 +7,9 @@ import java.util.UUID;
 public interface ProductService {
     public Product fetchProductDetails(UUID productReqId) throws InterruptedException, RuntimeException;
 
-    public String updateProduct(String productId);
+    public Product updateProductDetails(UUID productReqId) throws InterruptedException;
 
     public UUID insertProductRequest(String productId);
 
-    public UUID insertProductUpdateRequest(String productId);
+    public UUID insertProductUpdateRequest(Product product);
 }

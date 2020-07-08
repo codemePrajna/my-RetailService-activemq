@@ -21,10 +21,10 @@ import java.util.UUID;
 @Slf4j
 @StepScope
 public class ProductFetchWriter implements ItemWriter<String> {
-    @Autowired
-    ProductRepository productRepository;
     @Value("#{jobParameters['requestId']}")
     protected String requestId;
+    @Autowired
+    ProductRepository productRepository;
     @Autowired
     ProductQueue productQueue;
 
