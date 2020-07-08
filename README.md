@@ -59,9 +59,9 @@ BONUS: Accepts an HTTP PUT request at the same path (/products/{id}), containing
 - DB sharding and scaling
 
 ## To run the application
-Download the project. Navigate to the project folder and run mvn spring-boot:run Read the API documentation in Swagger2 (run http://localhost:8080/swagger-ui.html on the browser)
+Download the project. Navigate to the myRetail project folder and run mvn spring-boot:run (RetailServiceApplication) Read the API documentation in Swagger2 (run http://localhost:8080/swagger-ui.html on the browser)
 
 ## Screenshots
-![Load Product](.\images\LoadProduct.jpg)
+![Alt text](.\images\LoadProduct.jpg)
 ![Fetch Product](.\images\FetchProduct.jpg)
 ![Update Product](.\images\UpdateProduct.jpg)
