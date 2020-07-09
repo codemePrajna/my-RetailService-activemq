@@ -41,6 +41,8 @@ BONUS: Accepts an HTTP PUT request at the same path (/products/{id}), containing
 - service serves the requests to the user
 
 ## Technology used
+- Spring Batch
+- Spring scheduler
 - Multithreading concepts
 - producer-consumer
 - stateless communications
