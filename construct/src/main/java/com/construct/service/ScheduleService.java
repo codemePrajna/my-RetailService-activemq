@@ -11,14 +11,21 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
+@Service
 public class ScheduleService {
     @Autowired
     ProductQueue productQueue;
@@ -27,6 +34,9 @@ public class ScheduleService {
     @Autowired
     @Qualifier("productNameFetchJob")
     Job job;
+
+    @Autowired
+    Executor asyncExecutor;
 
     @Autowired
     ProductConstructService productConstructService;
@@ -53,10 +63,21 @@ public class ScheduleService {
                     .filter(entry -> ProductEnum.PENDING.equals(entry.getValue()))
                     .map(Map.Entry::getKey).collect(Collectors.toList());
             for (UUID prodReqId : productReqIdList) {
+              //  CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+                    JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
+                    jobParametersBuilder.addString("requestId", prodReqId.toString());
+                    try {
+                        jobLauncher.run(job, jobParametersBuilder.toJobParameters());
+                    } catch (Exception e) {
+                        throw new RuntimeException("Error occurred while fetching product details");
+                    }
+             //   }, asyncExecutor);
+            }
+            /*for (UUID prodReqId : productReqIdList) {
                 JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
                 jobParametersBuilder.addString("requestId", prodReqId.toString());
                 jobLauncher.run(job, jobParametersBuilder.toJobParameters());
-            }
+            }*/
         }
     }
 }
