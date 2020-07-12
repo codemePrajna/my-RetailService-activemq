@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
 @SpringBootApplication(scanBasePackages = {"com.common", "com.services", "com.construct"}, exclude = {
         MongoAutoConfiguration.class,
@@ -15,6 +16,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableMongoRepositories(basePackages = {"com.common.repository"})
 @EntityScan("com.common.entity")
 @EnableScheduling
+@EnableWebSecurity
 public class RetailServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(RetailServiceApplication.class, args);

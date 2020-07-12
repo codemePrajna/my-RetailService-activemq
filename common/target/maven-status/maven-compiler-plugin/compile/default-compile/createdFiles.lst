@@ -1,4 +1,5 @@
 com\common\exception\GlobalExceptionHandler.class
+com\common\config\SecurityConfig.class
 com\common\config\AsyncConfig.class
 com\common\util\ProductEnum.class
 com\common\repository\ProductRepository.class
