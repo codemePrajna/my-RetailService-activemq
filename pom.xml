@@ -19,6 +19,7 @@
         <lombok.version>1.18.8</lombok.version>
         <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
         <surefire.version>3.0.0-M4</surefire.version>
+        <oauth2.version>2.1.8.RELEASE</oauth2.version>
     </properties>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -80,6 +81,11 @@
             <artifactId>springfox-swagger-ui</artifactId>
             <version>2.9.2</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security.oauth.boot</groupId>
+            <artifactId>spring-security-oauth2-autoconfigure</artifactId>
+            <version>${oauth2.version}</version>
         </dependency>
         <!--  <dependency>
               <groupId>org.apache.httpcomponents</groupId>

@@ -25,6 +25,17 @@ public class SwaggerConfig {
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String DEFAULT_INCLUDE_PATTERN = "/v1/**";
+    /*@Bean
+    public Docket productApi() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .groupName("product")
+                .securityContexts(Lists.newArrayList(securityContext()))
+                .securitySchemes(Lists.newArrayList(apiKey()))
+                .apiInfo(apiInfo())
+                .select()
+                .paths(PathSelectors.ant(DEFAULT_INCLUDE_PATTERN))
+                .build();
+    }*/
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
