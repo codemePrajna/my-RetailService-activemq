@@ -27,8 +27,8 @@ public class SwaggerSecurityConfig {
     private String host = "http://localhost:8080";
 
     private static final String SECURITY_SCHEME_NAME = "spring_oauth";
-    private static final String CLIENT_ID = "spring-security-oauth2-read-write-client";
-    private static final String CLIENT_SECRET = "spring-security-oauth2-read-write-client-password1234";
+    private static final String CLIENT_ID = "client";
+    private static final String CLIENT_SECRET = "password";
 
     @Bean
     public SecurityConfiguration securityInfo() {
@@ -54,8 +54,8 @@ public class SwaggerSecurityConfig {
 
     @Bean
     public SecurityScheme securityScheme() {
-        LoginEndpoint loginEndpoint = new LoginEndpoint(host + "/oauth/authorize");
-        GrantType grantType = new ImplicitGrant(loginEndpoint, OAuth2AccessToken.ACCESS_TOKEN);
+        LoginEndpoint loginEndpoint = new LoginEndpoint(host + "/oauth/token");
+        GrantType grantType = new ImplicitGrant(loginEndpoint, OAuth2AccessToken.BEARER_TYPE);
 
         SecurityScheme oauth = new OAuthBuilder().name(SECURITY_SCHEME_NAME)
                 .grantTypes(Lists.newArrayList(grantType))

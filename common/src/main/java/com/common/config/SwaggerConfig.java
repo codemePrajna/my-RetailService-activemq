@@ -3,9 +3,11 @@ package com.common.config;
 
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.OAuthBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.*;
@@ -23,19 +25,9 @@ import java.util.List;
 @Slf4j
 public class SwaggerConfig {
 
+
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String DEFAULT_INCLUDE_PATTERN = "/v1/**";
-    /*@Bean
-    public Docket productApi() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .groupName("product")
-                .securityContexts(Lists.newArrayList(securityContext()))
-                .securitySchemes(Lists.newArrayList(apiKey()))
-                .apiInfo(apiInfo())
-                .select()
-                .paths(PathSelectors.ant(DEFAULT_INCLUDE_PATTERN))
-                .build();
-    }*/
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
@@ -48,7 +40,9 @@ public class SwaggerConfig {
     @Bean
     public Docket api() {
 
-        SecurityReference securityReference = SecurityReference.builder()
+        //Commented lines for basic auth
+
+        /*SecurityReference securityReference = SecurityReference.builder()
                 .reference("basicAuth")
                 .scopes(new AuthorizationScope[0])
                 .build();
@@ -60,15 +54,33 @@ public class SwaggerConfig {
         securityContexts.add(SecurityContext.builder().securityReferences(reference).build());
 
         ArrayList<SecurityScheme> auth = new ArrayList<>(1);
-        auth.add(new BasicAuth("basicAuth"));
+        auth.add(new BasicAuth("basicAuth"));*/
 
         return new Docket(DocumentationType.SWAGGER_2)
-                .securitySchemes(auth)
-                .securityContexts(securityContexts)
+                .securitySchemes(Lists.newArrayList(apiKey()))
+                .securityContexts(Arrays.asList(securityContext()))
                 .apiInfo(apiInfo())
                 .select()
                 .paths(PathSelectors.ant(DEFAULT_INCLUDE_PATTERN))
                 .build();
 
     }
+
+    private SecurityContext securityContext() {
+        return SecurityContext.builder().securityReferences(defaultAuth())
+                .forPaths(PathSelectors.any()).build();
+    }
+    private List<SecurityReference> defaultAuth() {
+        AuthorizationScope authorizationScope = new AuthorizationScope(
+                "global", "accessEverything");
+        AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
+        authorizationScopes[0] = authorizationScope;
+        return Arrays.asList(new SecurityReference("Bearer",
+                authorizationScopes));
+    }
+
+    private ApiKey apiKey() {
+        return new ApiKey("Bearer", "Authorization", "header");
+    }
+
 }
