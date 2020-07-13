@@ -46,6 +46,8 @@ BONUS: Accepts an HTTP PUT request at the same path (/products/{id}), containing
 - Multithreading concepts
 - producer-consumer
 - stateless communications
+- Oauth 2 security
+- Swagger
 
 ## Project Status
 - Initial working cut from receiving the data from user to publishing it back with details
@@ -55,7 +57,6 @@ BONUS: Accepts an HTTP PUT request at the same path (/products/{id}), containing
 
 - Caching
 - Pagination
-- Security
 - Resiliency
 - kafka /Blocking Queue wrapped on hashmap
 - DB sharding and scaling
