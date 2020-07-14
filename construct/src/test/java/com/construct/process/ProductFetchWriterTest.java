@@ -52,7 +52,7 @@ public class ProductFetchWriterTest {
         Mockito.when(productQueueMap.size()).thenReturn(1);
 
         Product productInput = Mockito.mock(Product.class);
-       // Mockito.when(productRepository.findByProductId(Mockito.anyString())).thenReturn(product);
+        // Mockito.when(productRepository.findByProductId(Mockito.anyString())).thenReturn(product);
         //Mockito.doReturn(product).when(productRepository).findByProductId(Mockito.anyString());
 
         Mockito.when(productInput.getName()).thenReturn("testName");

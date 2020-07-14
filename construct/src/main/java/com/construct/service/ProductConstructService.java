@@ -62,6 +62,7 @@ public class ProductConstructService {
         List<UUID> productReqIdList = productQueue.getProductUpdateStateQueue().entrySet().stream()
                 .filter(entry -> ProductEnum.PENDING.equals(entry.getValue()))
                 .map(Map.Entry::getKey).collect(Collectors.toList());
+        //check for all the pending requests and update the price for all the requests
         for (UUID productReqId : productReqIdList) {
             productQueue.getProductUpdateStateQueue().put(productReqId, ProductEnum.STARTED);
             Product product = productQueue.getProductUpdateQueue().get(productReqId);
@@ -69,6 +70,7 @@ public class ProductConstructService {
             returnedProduct.setPrice(product.getPrice());
             productRepository.save(returnedProduct);
             productQueue.getProductUpdateStateQueue().put(productReqId, ProductEnum.COMPLETED);
+            //notify service that the product details have been updated
             synchronized (SharedObject.updateObj) {
                 SharedObject.updateObj.notify();
             }

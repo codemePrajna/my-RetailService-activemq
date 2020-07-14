@@ -9,14 +9,14 @@ import java.util.concurrent.Executor;
 
 @Configuration
 @EnableAsync
-public class AsyncConfig  {
+public class AsyncConfig {
     @Bean(name = "asyncExecutor")
     public Executor asyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(7);
         executor.setMaxPoolSize(42);
         executor.setQueueCapacity(11);
-        executor.setThreadNamePrefix("ProductExecutor-");
+        executor.setThreadNamePrefix("ProductExec-");
         executor.initialize();
         return executor;
     }

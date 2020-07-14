@@ -22,28 +22,32 @@ public class OauthAuthServerConfig extends AuthorizationServerConfigurerAdapter 
     private AuthenticationManager authenticationManager;
     @Autowired
     private TokenStore tokenStore;
+
     @Override
-    public void configure (ClientDetailsServiceConfigurer clients) throws Exception {
-        clients.inMemory ()
-                .withClient ("client")
-                .authorizedGrantTypes ("password", "authorization_code", "refresh_token", "implicit")
-                .authorities ("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT", "USER")
-                .scopes ("read", "write")
-                .autoApprove (true)
-                .secret (passwordEncoder (). encode ("password"));
+    public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+        clients.inMemory()
+                .withClient("client")
+                .authorizedGrantTypes("password", "authorization_code", "refresh_token", "implicit")
+                .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT", "USER")
+                .scopes("read", "write")
+                .autoApprove(true)
+                .secret(passwordEncoder().encode("password"));
     }
+
     @Bean
-    public PasswordEncoder passwordEncoder () {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     @Override
-    public void configure (AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+    public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
         endpoints
-                .authenticationManager (authenticationManager)
-                .tokenStore (tokenStore);
+                .authenticationManager(authenticationManager)
+                .tokenStore(tokenStore);
     }
+
     @Bean
-    public TokenStore tokenStore () {
+    public TokenStore tokenStore() {
         return new InMemoryTokenStore();
     }
 }
