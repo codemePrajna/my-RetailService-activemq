@@ -1,20 +1,5 @@
 package com.services.controller;
 
-import com.common.entity.Product;
-import com.common.response.Response;
-import com.services.service.impl.ProductServiceImpl;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.UUID;
-
 /*
 @RunWith(SpringRunner.class)
 public class ProductControllerTest {

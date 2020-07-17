@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
 
 @RestController
 @Slf4j
@@ -35,13 +34,15 @@ public class ProductController {
      */
     @ApiOperation(value = "Fetch product Details for a given Product")
     @GetMapping(value = "/{productId}", produces = "application/json")
-    public ResponseEntity<Response<Product>> fetchProductDetails(@ApiParam(value = "ProductId", required = true) @PathVariable String productId) throws InterruptedException {
-        productService.insertProductRequest(productId);
+    public ResponseEntity<Response<Product>> fetchProductDetails(@ApiParam(value = "ProductId", required = true) @PathVariable String productId) throws InterruptedException,Exception {
+        UUID productReqId = productService.insertProductRequest(productId);
         //wait for the response from construct to load the product
         synchronized (SharedObject.sharedObj) {
             SharedObject.sharedObj.wait();
         }
-        Product product = productResponse.getProductResponse().get(productId);
+        Product product = productResponse.getProductResponse().get(productReqId);
+        if(product == null)
+        throw new RuntimeException("Product Details not available for: "+ productId);
         return new Response<Product>()
                 .setStatus(200)
                 .setMessage(product).toResponseEntity();
@@ -59,12 +60,14 @@ public class ProductController {
     public ResponseEntity<Response<Product>> updateProductDetails(@ApiParam(value = "ProductId", required = true) @PathVariable String productId
             , @RequestBody Product productInput) throws InterruptedException {
         productInput.setProductId(productId);
-        productService.insertProductUpdateRequest(productInput);
+        UUID productReqId = productService.insertProductUpdateRequest(productInput);
         //wait for the response from construct to load the product
         synchronized (SharedObject.sharedObj) {
             SharedObject.sharedObj.wait();
         }
-        Product product = productResponse.getProductResponse().get(productId);
+        Product product = productResponse.getProductResponse().get(productReqId);
+        if(product == null)
+            throw new RuntimeException("Product Details not available for: "+ productId);
         return new Response<Product>()
                 .setStatus(200)
                 .setMessage(product).toResponseEntity();

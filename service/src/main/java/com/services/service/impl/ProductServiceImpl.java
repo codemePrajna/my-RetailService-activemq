@@ -30,33 +30,39 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @TrackTimeUtil
     @JmsListener(destination = ActiveMQConfig.PRODUCT_RESPONSE_QUEUE)
-    public void fetchProductDetails(ProductRequest productRequest) throws InterruptedException, RuntimeException {
-        Product product = productRequest.getProduct();
+    public void fetchProductDetails(ProductRequest productRequest) throws RuntimeException {
+
 
 
         //change the state of the queue such that the entry can be deleted
        /* productQueue.getProductStateQueue().put(productReqId, ProductEnum.SERVED);
         Product product = productRepository.findByProductId(productQueue.getProductQueue().get(productReqId));*/
-        if (product == null || product.getName() == null) {
-            throw new RuntimeException("Product details not available");
+        if (productRequest == null) {
+            log.error("Product details not available");
+            throw new RuntimeException("Failed to retrieve product details for product");
         }
         //acquire lock on the object
         synchronized (SharedObject.sharedObj) {
-            try {
+
+                if(productRequest.getProductState().equals(ProductEnum.FAILED)){
+                    //productResponse.getProductResponse().put(productRequest.getProductId(), productRequest.getProduct());
+                    SharedObject.sharedObj.notify();
+
+                }
                 //fetch details of the products which are in pending state
-                  if (productRequest.getProductState().equals(ProductEnum.COMPLETED)) {
-                //wait until construct module loads the product details onto db
-                SharedObject.sharedObj.notify();
-                   }
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to retrieve product details for product");
-            }
+                if (productRequest.getProductState().equals(ProductEnum.COMPLETED)) {
+                    Product product = productRequest.getProduct();
+                    //wait until construct module loads the product details onto db
+                    productResponse.getProductResponse().put(productRequest.getProductRequestId(), product);
+                    SharedObject.sharedObj.notify();
+                }
+
         }
-        productResponse.getProductResponse().put(product.getProductId(),product);
+
     }
 
     @Override
-    public void insertProductRequest(String productId) {
+    public UUID insertProductRequest(String productId) {
         ProductRequest productRequest = new ProductRequest();
         //create a unique request id for the request
         UUID productReqId = UUID.randomUUID();
@@ -68,17 +74,20 @@ public class ProductServiceImpl implements ProductService {
         jmsTemplate.convertAndSend(ActiveMQConfig.PRODUCT_REQUEST_QUEUE, productRequest);
         /*productQueue.getProductQueue().put(productReqId, productId);
         productQueue.getProductStateQueue().put(productReqId, ProductEnum.PENDING);*/
+        return productReqId;
     }
 
     @Override
-    public void insertProductUpdateRequest(Product product) {
+    public UUID insertProductUpdateRequest(Product product) {
         ProductRequest productRequest = new ProductRequest();
         //create a unique request id for the request
         UUID productReqId = UUID.randomUUID();
+        productRequest.setProductId(product.getProductId());
         productRequest.setProduct(product);
         productRequest.setProductRequestId(productReqId);
         productRequest.setProductState(ProductEnum.PENDING);
         //push the update price request to queue
         jmsTemplate.convertAndSend(ActiveMQConfig.PRODUCT_UPDATE_QUEUE, productRequest);
+        return productReqId;
     }
 }

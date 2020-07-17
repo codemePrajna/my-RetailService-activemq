@@ -10,5 +10,5 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 @Data
 public class ProductResponse {
-    ConcurrentHashMap<String, Product> productResponse = new ConcurrentHashMap<>();
+    ConcurrentHashMap<UUID, Product> productResponse = new ConcurrentHashMap<>();
 }

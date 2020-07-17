@@ -10,7 +10,7 @@ import org.springframework.jms.annotation.EnableJms;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
-@SpringBootApplication(scanBasePackages = {"com.common", "com.services", "com.construct","com.myRetail"}, exclude = {
+@SpringBootApplication(scanBasePackages = {"com.common", "com.services", "com.construct", "com.myRetail"}, exclude = {
         MongoAutoConfiguration.class,
         MongoDataAutoConfiguration.class
 })

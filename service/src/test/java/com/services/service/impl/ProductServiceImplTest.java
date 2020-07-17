@@ -1,20 +1,5 @@
 package com.services.service.impl;
 
-import com.common.entity.Product;
-import com.common.repository.ProductRepository;
-import com.common.util.ProductEnum;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
 /*
 @RunWith(SpringRunner.class)
 public class ProductServiceImplTest {

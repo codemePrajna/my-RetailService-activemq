@@ -1,5 +1,6 @@
 package com.construct.process;
 
+import com.common.config.ActiveMQConfig;
 import com.common.model.ProductRequest;
 import com.common.util.ProductEnum;
 import com.common.util.TrackTimeUtil;
@@ -12,6 +13,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -33,6 +35,8 @@ public class ProductFetchReader implements ItemReader<String> {
     ProductQueue productQueue;
     @Autowired
     RestTemplate restTemplate;
+    @Autowired
+    private JmsTemplate jmsTemplate;
 
 
     @Override
@@ -68,7 +72,9 @@ public class ProductFetchReader implements ItemReader<String> {
             }
         } catch (Exception e) {
             productQueue.getProductQueue().get(UUID.fromString(requestId)).setProductState(ProductEnum.FAILED);
-            throw new RuntimeException("Product details not found");
+            productRequest.setProductState(ProductEnum.FAILED);
+            jmsTemplate.convertAndSend(ActiveMQConfig.PRODUCT_RESPONSE_QUEUE, productRequest);
+            throw new RuntimeException("Error fetching product details");
         }
         return productName;
     }

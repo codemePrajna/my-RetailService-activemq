@@ -51,13 +51,13 @@ public class ProductConstructService {
     private void updateProductDetails(ProductRequest productRequest) {
 
         productRequest.setProductState(ProductEnum.STARTED);
-            Product product = productRequest.getProduct();
-            Product returnedProduct = productRepository.findByProductId(product.getProductId());
-            returnedProduct.setPrice(product.getPrice());
-            productRepository.save(returnedProduct);
+        Product product = productRequest.getProduct();
+        Product returnedProduct = productRepository.findByProductId(product.getProductId());
+        returnedProduct.setPrice(product.getPrice());
+        productRepository.save(returnedProduct);
         productRequest.setProductState(ProductEnum.COMPLETED);
         productRequest.setProduct(returnedProduct);
-            //notify service that the product details have been updated
+        //notify service that the product details have been updated
         //insert the response of the product details to product response queue
         jmsTemplate.convertAndSend(ActiveMQConfig.PRODUCT_RESPONSE_QUEUE, productRequest);
 
@@ -65,13 +65,15 @@ public class ProductConstructService {
 
     /**
      * Function to update the product information received from user
+     *
      * @param productRequest
      */
     @TrackTimeUtil
     @JmsListener(destination = ActiveMQConfig.PRODUCT_UPDATE_QUEUE)
     public void updateProduct(ProductRequest productRequest) {
-
-        updateProductDetails(productRequest);
+        if (checkIfProductExists(productRequest)) {
+            updateProductDetails(productRequest);
+        }
 
 
     }
@@ -79,6 +81,7 @@ public class ProductConstructService {
     /**
      * fetch the product information for the request
      * consolidate with title information from target url
+     *
      * @param productRequest
      * @throws Exception
      */
@@ -86,23 +89,36 @@ public class ProductConstructService {
     @JmsListener(destination = ActiveMQConfig.PRODUCT_REQUEST_QUEUE)
     public void fetchProduct(ProductRequest productRequest) throws Exception {
         if (productRequest.getProductRequestId() != null) {
+            if (checkIfProductExists(productRequest)) {
+                //  CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+                JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
+                jobParametersBuilder.addString("requestId", productRequest.getProductRequestId().toString());
+                //receive the product request and place it in the map for reader to pick
+                productQueue.getProductQueue().put(productRequest.getProductRequestId(), productRequest);
+                try {
+                    jobLauncher.run(job, jobParametersBuilder.toJobParameters());
+                } catch (JobExecutionAlreadyRunningException e) {
+                    log.info("Fetching product details for [{}]", productQueue.getProductQueue().get(productRequest.getProductRequestId()));
+                } catch (Exception e) {
+                    throw new RuntimeException("Error occurred while fetching product details");
+                }
 
-            //  CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-            JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
-            jobParametersBuilder.addString("requestId", productRequest.getProductRequestId().toString());
-            //receive the product request and place it in the map for reader to pick
-            productQueue.getProductQueue().put(productRequest.getProductRequestId(),productRequest);
-            try {
-                jobLauncher.run(job, jobParametersBuilder.toJobParameters());
-            } catch (JobExecutionAlreadyRunningException e) {
-                log.info("Fetching product details for [{}]", productQueue.getProductQueue().get(productRequest.getProductRequestId()));
-            } catch (Exception e) {
-                throw new RuntimeException("Error occurred while fetching product details");
+                //   }, asyncExecutor);
+                //   }
+
             }
-
-            //   }, asyncExecutor);
-            //   }
-
         }
+
+
+    }
+
+    private boolean checkIfProductExists(ProductRequest productRequest) {
+        Product product = productRepository.findByProductId(productRequest.getProductId());
+        if (product == null) {
+            productRequest.setProductState(ProductEnum.FAILED);
+            jmsTemplate.convertAndSend(ActiveMQConfig.PRODUCT_RESPONSE_QUEUE, productRequest);
+            return false;
+        }
+        return true;
     }
 }
