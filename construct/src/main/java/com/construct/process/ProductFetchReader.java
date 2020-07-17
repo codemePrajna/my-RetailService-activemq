@@ -2,6 +2,7 @@ package com.construct.process;
 
 import com.common.model.ProductRequest;
 import com.common.util.ProductEnum;
+import com.common.util.TrackTimeUtil;
 import com.construct.util.ProductQueue;
 import lombok.extern.slf4j.Slf4j;
 import org.codehaus.jettison.json.JSONException;
@@ -35,6 +36,7 @@ public class ProductFetchReader implements ItemReader<String> {
 
 
     @Override
+    @TrackTimeUtil
     public String read() throws JSONException {
 
         String productName = null;

@@ -5,10 +5,10 @@ import com.common.entity.Product;
 import com.common.model.ProductRequest;
 import com.common.util.ProductEnum;
 import com.common.util.SharedObject;
+import com.common.util.TrackTimeUtil;
 import com.services.service.ProductResponse;
 import com.services.service.ProductService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.configuration.xml.ExceptionElementParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
@@ -28,6 +28,7 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
+    @TrackTimeUtil
     @JmsListener(destination = ActiveMQConfig.PRODUCT_RESPONSE_QUEUE)
     public void fetchProductDetails(ProductRequest productRequest) throws InterruptedException, RuntimeException {
         Product product = productRequest.getProduct();

@@ -5,8 +5,8 @@ import com.common.entity.Product;
 import com.common.model.ProductRequest;
 import com.common.repository.ProductRepository;
 import com.common.util.ProductEnum;
+import com.common.util.TrackTimeUtil;
 import com.construct.util.ProductQueue;
-import com.common.util.SharedObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -16,14 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -42,6 +35,7 @@ public class ProductConstructService {
     @Autowired
     private JmsTemplate jmsTemplate;
 
+    @TrackTimeUtil
     public void loadProductDetails() {
         log.info("Initializing database.");
         productRepository.deleteAll();
@@ -52,6 +46,7 @@ public class ProductConstructService {
         productRepository.save(new Product("16752456", 30.0, "USD"));
         log.info("Initializing database complete.");
     }
+
 
     private void updateProductDetails(ProductRequest productRequest) {
 
@@ -72,6 +67,7 @@ public class ProductConstructService {
      * Function to update the product information received from user
      * @param productRequest
      */
+    @TrackTimeUtil
     @JmsListener(destination = ActiveMQConfig.PRODUCT_UPDATE_QUEUE)
     public void updateProduct(ProductRequest productRequest) {
 
@@ -86,6 +82,7 @@ public class ProductConstructService {
      * @param productRequest
      * @throws Exception
      */
+    @TrackTimeUtil
     @JmsListener(destination = ActiveMQConfig.PRODUCT_REQUEST_QUEUE)
     public void fetchProduct(ProductRequest productRequest) throws Exception {
         if (productRequest.getProductRequestId() != null) {

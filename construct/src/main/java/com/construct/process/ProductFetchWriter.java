@@ -5,6 +5,7 @@ import com.common.entity.Product;
 import com.common.model.ProductRequest;
 import com.common.repository.ProductRepository;
 import com.common.util.ProductEnum;
+import com.common.util.TrackTimeUtil;
 import com.construct.util.ProductQueue;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -34,6 +35,7 @@ public class ProductFetchWriter implements ItemWriter<String> {
     private JmsTemplate jmsTemplate;
 
     @Override
+    @TrackTimeUtil
     public void write(List<? extends String> list) throws Exception {
         ProductRequest productRequest = productQueue.getProductQueue().get(UUID.fromString(requestId));
         //String productId = productRequest.getProductIdFromReqId(UUID.fromString(requestId));
