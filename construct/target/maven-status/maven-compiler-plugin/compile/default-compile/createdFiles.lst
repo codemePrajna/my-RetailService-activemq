@@ -2,8 +2,8 @@ com\construct\process\ProductFetchListener.class
 com\construct\service\ProductConstructService.class
 com\construct\process\ProductFetchReader.class
 com\construct\process\ProductFetchProcessor.class
+com\construct\util\ProductQueue.class
 com\construct\ConstructProductApplication.class
-com\construct\service\ScheduleService.class
 com\construct\config\ProductConstructConfig.class
 com\construct\process\ProductFetchWriter.class
 com\construct\controller\ProductConstructController.class

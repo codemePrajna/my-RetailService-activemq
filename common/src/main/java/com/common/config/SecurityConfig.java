@@ -23,17 +23,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserDetailsService userDetailsService;
 
-    /* private static final String[] AUTH_WHITELIST = {
-             // -- swagger ui
-             "/v2/api-docs",
-             "/swagger-resources",
-             "/swagger-resources/**",
-             "/configuration/ui",
-             "/configuration/security",
-             "/swagger-ui.html",
-             "/webjars/**"
-             // other public endpoints of your API may be appended to this array
-     };*/
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
@@ -62,7 +51,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests() // allow requests
                 .antMatchers("/swagger-ui.html")
                 .permitAll()
-                .antMatchers("/v1/**")
+                .antMatchers("/api/v1/**")
                 .authenticated()
                 .and()
                 .csrf().disable();

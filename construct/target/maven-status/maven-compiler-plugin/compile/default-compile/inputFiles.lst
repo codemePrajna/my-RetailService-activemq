@@ -1,4 +1,5 @@
 H:\Study Base\myRetailService\construct\src\main\java\com\construct\ConstructProductApplication.java
+H:\Study Base\myRetailService\construct\src\main\java\com\construct\util\ProductQueue.java
 H:\Study Base\myRetailService\construct\src\main\java\com\construct\service\ProductConstructService.java
 H:\Study Base\myRetailService\construct\src\main\java\com\construct\process\ProductFetchProcessor.java
 H:\Study Base\myRetailService\construct\src\main\java\com\construct\process\ProductFetchWriter.java
@@ -6,4 +7,3 @@ H:\Study Base\myRetailService\construct\src\main\java\com\construct\controller\P
 H:\Study Base\myRetailService\construct\src\main\java\com\construct\config\ProductConstructConfig.java
 H:\Study Base\myRetailService\construct\src\main\java\com\construct\process\ProductFetchListener.java
 H:\Study Base\myRetailService\construct\src\main\java\com\construct\process\ProductFetchReader.java
-H:\Study Base\myRetailService\construct\src\main\java\com\construct\service\ScheduleService.java

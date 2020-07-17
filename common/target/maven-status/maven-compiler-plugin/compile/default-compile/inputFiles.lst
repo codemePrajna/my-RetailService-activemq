@@ -1,10 +1,14 @@
+H:\Study Base\myRetailService\common\src\main\java\com\common\config\OauthAuthServerConfig.java
 H:\Study Base\myRetailService\common\src\main\java\com\common\exception\GlobalExceptionHandler.java
 H:\Study Base\myRetailService\common\src\main\java\com\common\util\ProductEnum.java
-H:\Study Base\myRetailService\common\src\main\java\com\common\config\MongoClientConfig.java
-H:\Study Base\myRetailService\common\src\main\java\com\common\util\ProductQueue.java
+H:\Study Base\myRetailService\common\src\main\java\com\common\model\ProductRequest.java
 H:\Study Base\myRetailService\common\src\main\java\com\common\util\SharedObject.java
 H:\Study Base\myRetailService\common\src\main\java\com\common\config\AsyncConfig.java
+H:\Study Base\myRetailService\common\src\main\java\com\common\config\ResourceServerConfig.java
 H:\Study Base\myRetailService\common\src\main\java\com\common\response\Response.java
 H:\Study Base\myRetailService\common\src\main\java\com\common\config\SwaggerConfig.java
-H:\Study Base\myRetailService\common\src\main\java\com\common\entity\Product.java
+H:\Study Base\myRetailService\common\src\main\java\com\common\config\SecurityConfig.java
 H:\Study Base\myRetailService\common\src\main\java\com\common\repository\ProductRepository.java
+H:\Study Base\myRetailService\common\src\main\java\com\common\config\ActiveMQConfig.java
+H:\Study Base\myRetailService\common\src\main\java\com\common\config\SwaggerSecurityConfig.java
+H:\Study Base\myRetailService\common\src\main\java\com\common\entity\Product.java

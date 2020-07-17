@@ -1,7 +1,8 @@
 package com.construct.process;
 
+import com.common.model.ProductRequest;
 import com.common.util.ProductEnum;
-import com.common.util.ProductQueue;
+import com.construct.util.ProductQueue;
 import lombok.extern.slf4j.Slf4j;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -32,21 +33,28 @@ public class ProductFetchReader implements ItemReader<String> {
     @Autowired
     RestTemplate restTemplate;
 
+
     @Override
     public String read() throws JSONException {
+
         String productName = null;
-        if (productQueue.getProductStateQueue().size() == 0) {
+        //return from reader if no request found
+        if (productQueue.getProductQueue().size() == 0) {
             return null;
         }
-        if (productQueue.getProductStateQueue().get(UUID.fromString(requestId)).equals(ProductEnum.COMPLETED)) {
+        //return from reader if map has no request enqueued
+        if (productQueue.getProductQueue().get(UUID.fromString(requestId)) == null) {
             return null;
         }
-        if (requestId == null) {
+        //return from reader if the request has been fetched and processed
+        ProductRequest productRequest = productQueue.getProductQueue().get(UUID.fromString(requestId));
+        if (productRequest.getProductState().equals(ProductEnum.COMPLETED)) {
             return null;
         }
-        String productId = productQueue.getProductQueue().get(UUID.fromString(requestId));
-        productQueue.getProductStateQueue().put(UUID.fromString(requestId), ProductEnum.STARTED);
+        String productId = productRequest.getProductId();
+        productQueue.getProductQueue().get(UUID.fromString(requestId)).setProductState(ProductEnum.STARTED);
         try {
+            //get the title information from target url
             ResponseEntity<String> productResponse = restTemplate.getForEntity(getTargetURL(productId), String.class);
             if (productResponse != null) {
                 JSONObject jsonObject = new JSONObject(productResponse.getBody());
@@ -57,6 +65,7 @@ public class ProductFetchReader implements ItemReader<String> {
 
             }
         } catch (Exception e) {
+            productQueue.getProductQueue().get(UUID.fromString(requestId)).setProductState(ProductEnum.FAILED);
             throw new RuntimeException("Product details not found");
         }
         return productName;

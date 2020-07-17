@@ -18,11 +18,12 @@ BONUS: Accepts an HTTP PUT request at the same path (/products/{id}), containing
 ## Tech Stack
 
 - Oracle open JDK 14
-- Maven
+- Maven 3.8.1
+- ActiveMq 5.14
 - Junit 3
 - Spring boot 2.2.5 -multimodule
 - RestTemplate
-- Embedded Mongo DB
+- Embedded Mongo DB 3.2.2
 - Swagger 2
 
 ## Modules and description

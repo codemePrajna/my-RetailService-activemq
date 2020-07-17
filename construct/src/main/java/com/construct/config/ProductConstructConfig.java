@@ -1,11 +1,10 @@
 package com.construct.config;
 
-import com.common.util.ProductQueue;
+import com.construct.util.ProductQueue;
 import com.construct.process.ProductFetchListener;
 import com.construct.process.ProductFetchProcessor;
 import com.construct.process.ProductFetchReader;
 import com.construct.process.ProductFetchWriter;
-import com.construct.service.ScheduleService;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
@@ -64,9 +63,4 @@ public class ProductConstructConfig {
         return new RestTemplate();
     }
 
-    @Bean
-    //@Conditional(ConditionClass.class)
-    public ScheduleService scheduleJob() {
-        return new ScheduleService();
-    }
 }

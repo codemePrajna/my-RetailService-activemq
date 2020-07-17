@@ -1,12 +1,21 @@
 package com.construct.service;
 
+import com.common.config.ActiveMQConfig;
 import com.common.entity.Product;
+import com.common.model.ProductRequest;
 import com.common.repository.ProductRepository;
 import com.common.util.ProductEnum;
-import com.common.util.ProductQueue;
+import com.construct.util.ProductQueue;
 import com.common.util.SharedObject;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jms.annotation.JmsListener;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -24,6 +33,14 @@ public class ProductConstructService {
     ProductRepository productRepository;
     @Autowired
     ProductQueue productQueue;
+    @Autowired
+    JobLauncher jobLauncher;
+    @Autowired
+    @Qualifier("productNameFetchJob")
+    Job job;
+
+    @Autowired
+    private JmsTemplate jmsTemplate;
 
     public void loadProductDetails() {
         log.info("Initializing database.");
@@ -36,45 +53,59 @@ public class ProductConstructService {
         log.info("Initializing database complete.");
     }
 
-    /**
-     * Clear all the queues whose product details have been served to user
-     */
-    @Async
-    @Scheduled(fixedDelay = 2000)
-    public void clearProductQueue() {
-        if (productQueue.getProductStateQueue().contains(ProductEnum.SERVED)) {
-            List<UUID> productReqIdList = productQueue.getProductStateQueue().entrySet().stream()
-                    .filter(entry -> ProductEnum.SERVED.equals(entry.getValue()))
-                    .map(Map.Entry::getKey).collect(Collectors.toList());
-            productQueue.getProductQueue().keySet().removeAll(productReqIdList);
-            productQueue.getProductStateQueue().keySet().removeAll(productReqIdList);
-        }
-        if (productQueue.getProductUpdateStateQueue().contains(ProductEnum.SERVED)) {
-            List<UUID> productReqIdList = productQueue.getProductUpdateStateQueue().entrySet().stream()
-                    .filter(entry -> ProductEnum.SERVED.equals(entry.getValue()))
-                    .map(Map.Entry::getKey).collect(Collectors.toList());
-            productQueue.getProductUpdateQueue().keySet().removeAll(productReqIdList);
-            productQueue.getProductUpdateStateQueue().keySet().removeAll(productReqIdList);
-        }
-    }
+    private void updateProductDetails(ProductRequest productRequest) {
 
-    public void updateProductDetails() {
-        List<UUID> productReqIdList = productQueue.getProductUpdateStateQueue().entrySet().stream()
-                .filter(entry -> ProductEnum.PENDING.equals(entry.getValue()))
-                .map(Map.Entry::getKey).collect(Collectors.toList());
-        //check for all the pending requests and update the price for all the requests
-        for (UUID productReqId : productReqIdList) {
-            productQueue.getProductUpdateStateQueue().put(productReqId, ProductEnum.STARTED);
-            Product product = productQueue.getProductUpdateQueue().get(productReqId);
+        productRequest.setProductState(ProductEnum.STARTED);
+            Product product = productRequest.getProduct();
             Product returnedProduct = productRepository.findByProductId(product.getProductId());
             returnedProduct.setPrice(product.getPrice());
             productRepository.save(returnedProduct);
-            productQueue.getProductUpdateStateQueue().put(productReqId, ProductEnum.COMPLETED);
+        productRequest.setProductState(ProductEnum.COMPLETED);
+        productRequest.setProduct(returnedProduct);
             //notify service that the product details have been updated
-            synchronized (SharedObject.updateObj) {
-                SharedObject.updateObj.notify();
-            }
-        }
+        //insert the response of the product details to product response queue
+        jmsTemplate.convertAndSend(ActiveMQConfig.PRODUCT_RESPONSE_QUEUE, productRequest);
 
+    }
+
+    /**
+     * Function to update the product information received from user
+     * @param productRequest
+     */
+    @JmsListener(destination = ActiveMQConfig.PRODUCT_UPDATE_QUEUE)
+    public void updateProduct(ProductRequest productRequest) {
+
+        updateProductDetails(productRequest);
+
+
+    }
+
+    /**
+     * fetch the product information for the request
+     * consolidate with title information from target url
+     * @param productRequest
+     * @throws Exception
+     */
+    @JmsListener(destination = ActiveMQConfig.PRODUCT_REQUEST_QUEUE)
+    public void fetchProduct(ProductRequest productRequest) throws Exception {
+        if (productRequest.getProductRequestId() != null) {
+
+            //  CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+            JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
+            jobParametersBuilder.addString("requestId", productRequest.getProductRequestId().toString());
+            //receive the product request and place it in the map for reader to pick
+            productQueue.getProductQueue().put(productRequest.getProductRequestId(),productRequest);
+            try {
+                jobLauncher.run(job, jobParametersBuilder.toJobParameters());
+            } catch (JobExecutionAlreadyRunningException e) {
+                log.info("Fetching product details for [{}]", productQueue.getProductQueue().get(productRequest.getProductRequestId()));
+            } catch (Exception e) {
+                throw new RuntimeException("Error occurred while fetching product details");
+            }
+
+            //   }, asyncExecutor);
+            //   }
+
+        }
     }
 }

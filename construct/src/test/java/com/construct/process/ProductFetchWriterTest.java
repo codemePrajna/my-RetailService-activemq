@@ -2,7 +2,7 @@ package com.construct.process;
 
 import com.common.entity.Product;
 import com.common.repository.ProductRepository;
-import com.common.util.ProductQueue;
+import com.construct.util.ProductQueue;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

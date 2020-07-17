@@ -2,7 +2,7 @@ package com.construct.process;
 
 import com.common.response.Response;
 import com.common.util.ProductEnum;
-import com.common.util.ProductQueue;
+import com.construct.util.ProductQueue;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Assert;

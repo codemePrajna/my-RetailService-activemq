@@ -39,22 +39,6 @@ public class SwaggerConfig {
     @Bean
     public Docket api() {
 
-        //Commented lines for basic auth
-
-        /*SecurityReference securityReference = SecurityReference.builder()
-                .reference("basicAuth")
-                .scopes(new AuthorizationScope[0])
-                .build();
-
-        ArrayList<SecurityReference> reference = new ArrayList<>(1);
-        reference.add(securityReference);
-
-        ArrayList<SecurityContext> securityContexts = new ArrayList<>(1);
-        securityContexts.add(SecurityContext.builder().securityReferences(reference).build());
-
-        ArrayList<SecurityScheme> auth = new ArrayList<>(1);
-        auth.add(new BasicAuth("basicAuth"));*/
-
         return new Docket(DocumentationType.SWAGGER_2)
                 .securitySchemes(Lists.newArrayList(apiKey()))
                 .securityContexts(Arrays.asList(securityContext()))
