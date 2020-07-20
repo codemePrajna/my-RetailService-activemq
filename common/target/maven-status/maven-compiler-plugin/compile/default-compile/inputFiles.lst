@@ -11,4 +11,5 @@ H:\Study Base\myRetailService\common\src\main\java\com\common\config\SecurityCon
 H:\Study Base\myRetailService\common\src\main\java\com\common\repository\ProductRepository.java
 H:\Study Base\myRetailService\common\src\main\java\com\common\config\ActiveMQConfig.java
 H:\Study Base\myRetailService\common\src\main\java\com\common\config\SwaggerSecurityConfig.java
+H:\Study Base\myRetailService\common\src\main\java\com\common\util\TrackTimeUtil.java
 H:\Study Base\myRetailService\common\src\main\java\com\common\entity\Product.java

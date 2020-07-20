@@ -1,5 +1,6 @@
 package com.construct.process;
 
+import com.common.model.ProductRequest;
 import com.common.response.Response;
 import com.common.util.ProductEnum;
 import com.construct.util.ProductQueue;
@@ -31,6 +32,8 @@ public class ProductFetchReaderTest {
     @Mock
     RestTemplate restTemplate;
 
+
+
     public void setUp() throws Exception {
     }
 
@@ -40,12 +43,13 @@ public class ProductFetchReaderTest {
     @Test
     public void testRead() throws JSONException {
         UUID randomId = UUID.randomUUID();
+        ProductRequest productRequest = Mockito.mock(ProductRequest.class);
         productFetchReader.targetUrl = "https://redsky.target.com/v2/pdp/tcin/";
         productFetchReader.requestId = randomId.toString();
         ConcurrentHashMap productStateQueue = Mockito.mock(ConcurrentHashMap.class);
         ConcurrentHashMap productQueueMap = Mockito.mock(ConcurrentHashMap.class);
 
-        Mockito.when(productQueue.getProductQueue()).thenReturn(productQueueMap);
+        //Mockito.when(productQueue.getProductQueue()).thenReturn(productRequest);
         Mockito.when(productQueueMap.get(randomId)).thenReturn("12345");
         Mockito.when(productQueueMap.size()).thenReturn(1);
 

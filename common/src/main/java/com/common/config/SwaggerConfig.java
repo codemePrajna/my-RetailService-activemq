@@ -25,8 +25,8 @@ import java.util.List;
 public class SwaggerConfig {
 
 
-    public static final String AUTHORIZATION_HEADER = "Authorization";
-    public static final String DEFAULT_INCLUDE_PATTERN = "/api/v1/**";
+    public static final String USER_PATTERN = "/api/v1/**";
+    public static final String ADMIN_PATTERN = "/admin/**";
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
@@ -37,14 +37,29 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public Docket api() {
+    public Docket userApi() {
 
         return new Docket(DocumentationType.SWAGGER_2)
                 .securitySchemes(Lists.newArrayList(apiKey()))
                 .securityContexts(Arrays.asList(securityContext()))
                 .apiInfo(apiInfo())
+                .groupName("User Service")
                 .select()
-                .paths(PathSelectors.ant(DEFAULT_INCLUDE_PATTERN))
+                .paths(PathSelectors.ant(USER_PATTERN))
+                .build();
+
+    }
+
+    @Bean
+    public Docket adminApi() {
+
+        return new Docket(DocumentationType.SWAGGER_2)
+                .securitySchemes(Lists.newArrayList(apiKey()))
+                .securityContexts(Arrays.asList(securityContext()))
+                .apiInfo(apiInfo())
+                .groupName("Admin Service")
+                .select()
+                .paths(PathSelectors.ant(ADMIN_PATTERN))
                 .build();
 
     }
